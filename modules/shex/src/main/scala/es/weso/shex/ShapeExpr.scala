@@ -172,7 +172,7 @@ case class Shape(
                   closed: Option[Boolean],
                   extra: Option[List[IRI]], // TODO: Extend extras to handle Paths?
                   expression: Option[TripleExpr],
-                  _extends: Option[List[ShapeLabel]],
+                  _extends: Option[List[ShapeExpr]],
                   annotations: Option[List[Annotation]],
                   actions: Option[List[SemAct]]
                 ) extends ShapeExpr with Extend {
@@ -189,7 +189,7 @@ case class Shape(
     extra.getOrElse(List()).map(Direct(_))
 
   def getExtra: List[IRI] = extra.getOrElse(Shape.emptyExtra)
-  def getExtend: List[ShapeLabel] = _extends.getOrElse(Shape.emptyExtends)
+  def getExtend: List[ShapeExpr] = _extends.getOrElse(Shape.emptyExtends)
   def getAnnotations: List[Annotation] = annotations.getOrElse(Shape.emptyAnnotations)
   def getActions: List[SemAct] = actions.getOrElse(Shape.emptySemActs)
 
@@ -204,7 +204,7 @@ case class Shape(
   }
 
   // def tripleExpr = expression.getOrElse(TripleExpr.any)
-  private def extend(s: ShapeExpr): Option[List[ShapeLabel]] = s match {
+  private def extend(s: ShapeExpr): Option[List[ShapeExpr]] = s match {
     case s: Shape => s._extends
     case _ => None
   }
@@ -227,14 +227,15 @@ case class Shape(
     def combinePaths(p1: List[Path],
                      p2: List[Path]
                     ): List[Path] = p1 ++ p2
-    extendCheckingVisited(this, schema.getShape(_), extend, combinePaths, getPath).map(_.getOrElse(List()))
+    extendCheckingVisited(this, getShapeExpr(schema), extend, combinePaths, getPath).map(_.getOrElse(List()))
   }
+
 
   def extendExpression(schema: Schema): Either[String,Option[TripleExpr]] = {
     def combine(e1: TripleExpr, e2: TripleExpr): TripleExpr = {
       EachOf(None,List(e1,e2),None,None,None,None)
     }
-    extendCheckingVisited(this, schema.getShape(_), extend, combine, expr)
+    extendCheckingVisited(this, getShapeExpr(schema), extend, combine, expr)
   }
 
   override def addAnnotations(as: List[Annotation]): ShapeExpr = {
@@ -245,6 +246,14 @@ case class Shape(
   }
 
   override def getShapeRefs(schema: Schema) = expression.map(_.getShapeRefs(schema)).getOrElse(List())
+
+  private def getShapeExpr(schema: Schema)(e: ShapeExpr): Either[String,ShapeExpr] = e match {
+    case ShapeRef(lbl,_,_) => schema.getShape(lbl)
+    case _ => Right(e)
+  } /* for {
+    label <- e.id.toRight(s"getShapeExpr: Expression $e has no Label")
+    shapeExpr <- schema.getShape(label)
+  } yield shapeExpr */
 
 }
 
@@ -263,7 +272,7 @@ object Shape {
   def defaultVirtual = false
   def defaultClosed = false
   def emptyExtra = List[IRI]()
-  def emptyExtends = List[ShapeLabel]()
+  def emptyExtends = List[ShapeExpr]()
   def emptySemActs = List[SemAct]()
   def emptyAnnotations = List[Annotation]()
   def defaultExpr = None

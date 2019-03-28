@@ -964,13 +964,13 @@ class SchemaMaker extends ShExDocBaseVisitor[Any] with LazyLogging {
     val extras: Option[List[IRI]] =
       if (ls.isEmpty) None
       else Some(ls)
-    val inheritList = qualifiers.map(_.getIncluded).flatten
+    val extendsList = qualifiers.map(_.getExtensions).flatten
     val shape =
       Shape.empty.copy(
       closed = containsClosed,
       extra = extras,
       expression = tripleExpr,
-      _extends = if (inheritList.isEmpty) None else Some(inheritList),
+      _extends = if (extendsList.isEmpty) None else Some(extendsList),
       actions = if (semActs.isEmpty) None else Some(semActs),
       annotations = if (anns.isEmpty) None else Some(anns)
     )
@@ -988,7 +988,7 @@ class SchemaMaker extends ShExDocBaseVisitor[Any] with LazyLogging {
   }
 
   override def visitExtension(ctx: ExtensionContext): Builder[Qualifier] = for {
-    sl <- visitShapeExprLabel(ctx.shapeExprLabel())
+    sl <- visitShapeOrRef(ctx.shapeOrRef())
   } yield Extends(sl)
 
   override def visitExtraPropertySet(ctx: ExtraPropertySetContext): Builder[Qualifier] = for {
@@ -1359,9 +1359,9 @@ class SchemaMaker extends ShExDocBaseVisitor[Any] with LazyLogging {
         case _ => List()
       }
     }
-    def getIncluded: List[ShapeLabel] = {
+    def getExtensions: List[ShapeExpr] = {
       this match {
-        case Extends(label) => List(label)
+        case Extends(shapeExpr) => List(shapeExpr)
         case _ => List()
       }
     }
@@ -1369,7 +1369,7 @@ class SchemaMaker extends ShExDocBaseVisitor[Any] with LazyLogging {
 
   case class Extra(iris: List[IRI]) extends Qualifier
 
-  case class Extends(label: ShapeLabel) extends Qualifier
+  case class Extends(shapeExpr: ShapeExpr) extends Qualifier
 
   case object Closed extends Qualifier
 

@@ -362,7 +362,7 @@ case class Validator(schema: Schema,
       case Some(es) => checkShapeExtendLs(attempt, node, s, es)
     }
 
-  private[validator] def checkShapeExtendLs(attempt: Attempt, node: RDFNode, s: Shape, es: List[ShapeLabel]): CheckTyping = {
+  private[validator] def checkShapeExtendLs(attempt: Attempt, node: RDFNode, s: Shape, es: List[ShapeExpr]): CheckTyping = {
     es match {
       case Nil => checkShapeBase(attempt,node,s)
       case e :: Nil => checkShapeExtend(attempt, node, s, e)
@@ -373,14 +373,13 @@ case class Validator(schema: Schema,
   private[validator] def checkShapeExtend(attempt: Attempt,
                                           node: RDFNode,
                                           s: Shape,
-                                          baseLabel: ShapeLabel
+                                          baseExpr: ShapeExpr
                                          ): CheckTyping = for {
-    base <- getShape(baseLabel)
     paths <- fromEither(s.paths(schema).leftMap(msgErr(_)))
-    _ <- { println(s"checkShapeExtend(node=$node,shape=${s.show},base=$baseLabel). \npaths=$paths") ; ok(()) }
+    _ <- { println(s"checkShapeExtend(node=$node,shape=${s.show},baseExpr=$baseExpr). \npaths=$paths") ; ok(()) }
     neighs <- getNeighPaths(node, paths)
     partitions = SetUtils.pSet(neighs.toSet)
-    _ <- checkSomeFlag(partitions,checkPartition(base,s,attempt,node), noPartition(node, neighs))
+    _ <- checkSomeFlag(partitions,checkPartition(baseExpr,s,attempt,node), noPartition(node, neighs))
     typing <- getTyping
   } yield typing
 

@@ -228,8 +228,8 @@ prefixedName    : PNAME_LN
 				;
 blankNode       : BLANK_NODE_LABEL ;
 
-extension      : KW_EXTENDS shapeExprLabel
-                | '&' shapeExprLabel
+extension      : KW_EXTENDS shapeOrRef
+                | '&' shapeOrRef
                 ;
 restrictions    : KW_RESTRICTS shapeExprLabel+
                 | '-' shapeExprLabel+

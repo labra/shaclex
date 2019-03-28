@@ -401,7 +401,7 @@ lazy val packagingSettings = Seq(
 )
 
 lazy val compilationSettings = Seq(
-  scalaVersion := "2.12.6",
+  scalaVersion := "2.12.7",
   // format: off
   scalacOptions ++= Seq(
     "-deprecation",                      // Emit warning and location for usages of deprecated APIs.

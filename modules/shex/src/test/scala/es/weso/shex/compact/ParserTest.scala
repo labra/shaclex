@@ -14,13 +14,13 @@ class ParserTest extends FunSpec with JsonTest with Matchers with EitherValues {
         Some(List(Shape(Some(IRILabel(IRI("S"))),None,Some(false),None,None,None,None,None))),None,List())
     )
 
-    shouldParse(s"<S> extends <T> { }", None,
+/*    shouldParse(s"<S> extends <T> { }", None,
       Schema.empty.addShape(Shape.empty.copy(
         id = Some(IRILabel(IRI("S"))),
         closed = Some(false),
         _extends=Some(List(IRILabel(IRI("T")))))
       )
-    )
+    ) */
 
     def shouldParse(str:String, base: Option[String], expected: Schema): Unit = {
       it(s"Should parse $str and obtain $expected") {

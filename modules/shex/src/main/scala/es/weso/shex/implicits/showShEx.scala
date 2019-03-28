@@ -234,7 +234,7 @@ object showShEx {
       case Some(ls) => "[" + ls.map(_.show).mkString(" ") + "]"
     }
 
-  private def optShowExtends(maybeValues: Option[List[ShapeLabel]]): String =
+  private def optShowExtends(maybeValues: Option[List[ShapeExpr]]): String =
     maybeValues match {
       case None => ""
       case Some(ls) => " extends " + ls.map(_.show).mkString(",")
