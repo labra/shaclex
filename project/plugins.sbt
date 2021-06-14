@@ -7,7 +7,7 @@ addSbtPlugin("com.typesafe.sbt"  % "sbt-site"            % "1.4.1")
 addSbtPlugin("com.typesafe.sbt"  % "sbt-native-packager" % "1.8.0")
 addSbtPlugin("com.typesafe.sbt"  % "sbt-git"             % "1.0.0")
 addSbtPlugin("org.lyranthe.sbt"  % "partial-unification" % "1.1.2")
-addSbtPlugin("org.scoverage"     % "sbt-scoverage"       % "1.6.1")
+addSbtPlugin("org.scoverage"     % "sbt-scoverage"       % "1.8.2")
 
 addCompilerPlugin("com.olegpy"   %% "better-monadic-for" % "0.3.1")
 
